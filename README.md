@@ -1,2 +1,2 @@
 # FastAPI - Python
-- Apredendo a criar APIs com Python
+- Aprendendo a desenvolver APIs com Python
