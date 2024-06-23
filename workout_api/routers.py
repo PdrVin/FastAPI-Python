@@ -7,4 +7,4 @@ from workout_api.centro_treinamento.controller import router as cen_treinamento
 api_router = APIRouter()
 api_router.include_router(atleta, prefix="/atletas", tags=["atletas"])
 api_router.include_router(categoria, prefix="/categorias", tags=["categorias"])
-api_router.include_router(cen_treinamento, prefix="/centro_treinamento", tags=["centro_treinamento"])
+api_router.include_router(cen_treinamento, prefix="/centros_treinamento", tags=["centros_treinamento"])
