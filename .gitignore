@@ -1,7 +1,3 @@
 .venv
-workout_api/__pycache__
-workout_api/atleta/__pycache__
-workout_api/base/__pycache__
-workout_api/categoria/__pycache__
-workout_api/centro_treinamento/__pycache__
-workout_api/configs/__pycache__
+__pycache__/
+

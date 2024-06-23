@@ -1,5 +1,5 @@
 from typing import Annotated
-from pydantic import UUID4, Field
+from pydantic import Field, UUID4
 from workout_api.base.schemas import BaseSchema
 
 

@@ -49,7 +49,7 @@ async def query(db_session: DatabaseDependency) -> list[CategoriaOut]:
     status_code=status.HTTP_200_OK,
     response_model=CategoriaOut,
 )
-async def query(id: UUID4, db_session: DatabaseDependency) -> list[CategoriaOut]:
+async def get_id(id: UUID4, db_session: DatabaseDependency) -> CategoriaOut:
     categoria: CategoriaOut = (
         (await db_session.execute(select(CategoriaModel).filter_by(id=id)))
         .scalars()

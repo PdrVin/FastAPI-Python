@@ -24,7 +24,6 @@ async def post(
     db_session: DatabaseDependency,
     centro_treinamento_in: CentroTreinamentoIn = Body(...),
 ) -> CentroTreinamentoOut:
-
     centro_treinamento_out = CentroTreinamentoOut(
         id=uuid4(), **centro_treinamento_in.model_dump()
     )
@@ -57,7 +56,7 @@ async def query(db_session: DatabaseDependency) -> list[CentroTreinamentoOut]:
     status_code=status.HTTP_200_OK,
     response_model=CentroTreinamentoOut,
 )
-async def query(
+async def get_id(
     id: UUID4, db_session: DatabaseDependency
 ) -> list[CentroTreinamentoOut]:
     centrotreinamento: CentroTreinamentoOut = (

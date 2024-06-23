@@ -17,7 +17,7 @@ router = APIRouter()
 # POST
 @router.post(
     "/",
-    summary="Criar um Novo Atleta",
+    summary="Criar Novo Atleta",
     status_code=status.HTTP_201_CREATED,
     response_model=AtletaOut,
 )
