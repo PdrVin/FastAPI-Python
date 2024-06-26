@@ -28,7 +28,11 @@ async def post(
     # Campo Categoria
     categoria_name = atleta_in.categoria.nome
     categoria = (
-        await db_session.execute(select(CategoriaModel).filter_by(nome=categoria_name))
+        (
+            await db_session.execute(
+                select(CategoriaModel).filter_by(nome=categoria_name)
+            )
+        )
         .scalars()
         .first()
     )
@@ -42,8 +46,10 @@ async def post(
     # Campo Centro Treinamento
     centro_treinamento_nome = atleta_in.centro_treinamento.nome
     centro_treinamento = (
-        await db_session.execute(
-            select(CentroTreinamentoModel).filter_by(nome=centro_treinamento_nome)
+        (
+            await db_session.execute(
+                select(CentroTreinamentoModel).filter_by(nome=centro_treinamento_nome)
+            )
         )
         .scalars()
         .first()
@@ -150,6 +156,7 @@ async def patch(
 
     return atleta
 
+
 # DELETE
 @router.delete(
     "/{id}",
@@ -168,6 +175,6 @@ async def delete(id: UUID4, db_session: DatabaseDependency) -> None:
             status_code=status.HTTP_404_NOT_FOUND,
             detail=f"Atleta não encontrado no id: {id}",
         )
-        
+
     await db_session.delete(atleta)
     await db_session.commit()

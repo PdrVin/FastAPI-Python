@@ -9,7 +9,6 @@ from alembic import context
 from workout_api.base.models import BaseModel
 from workout_api.base.repository.models import *
 
-
 config = context.config
 
 if config.config_file_name is not None:
@@ -26,7 +25,7 @@ def run_migrations_offline() -> None:
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},
     )
-    
+
     with context.begin_transaction():
         context.run_migrations()
 
@@ -44,7 +43,6 @@ async def run_async_migrations() -> None:
         prefix="sqlalchemy.",
         poolclass=pool.NullPool,
     )
-
     async with connectable.connect() as connection:
         await connection.run_sync(do_run_migrations)
 

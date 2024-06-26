@@ -19,13 +19,13 @@ class AtletaModel(BaseModel):
 
     # FK Categoria
     categoria: Mapped["CategoriaModel"] = relationship(  # type: ignore
-        back_populates="atletas", lazy="selectin"
+        back_populates="atleta_ctg", lazy="selectin"
     )
     categoria_id: Mapped[int] = mapped_column(ForeignKey("categorias.pk_id"))
 
     # FK Centro Treinamento
     centro_treinamento: Mapped["CentroTreinamentoModel"] = relationship(  # type: ignore
-        back_populates="atletas", lazy="selectin"
+        back_populates="atleta_cet", lazy="selectin"
     )
     centro_treinamento_id: Mapped[int] = mapped_column(
         ForeignKey("centros_treinamento.pk_id")
