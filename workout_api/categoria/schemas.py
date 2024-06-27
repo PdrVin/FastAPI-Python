@@ -5,9 +5,17 @@ from workout_api.base.schemas import BaseSchema
 
 class CategoriaIn(BaseSchema):
     nome: Annotated[
-        str, Field(description="Nome da Categoria", example="Scale", max_length=10)
+        str,
+        Field(
+            description="Nome da categoria",
+            example="Scale",
+            max_length=10,
+        ),
     ]
 
 
-class CategoriaOut(BaseSchema):
-    id: Annotated[UUID4, Field(description="Identificador da Categoria")]
+class CategoriaOut(CategoriaIn):
+    id: Annotated[
+        UUID4,
+        Field(description="Identificador da categoria"),
+    ]

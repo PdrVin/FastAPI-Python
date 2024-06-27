@@ -14,6 +14,7 @@ from sqlalchemy.future import select
 router = APIRouter()
 
 
+# POST
 @router.post(
     "/",
     summary="Criar Novo Centro de Treinamento",
@@ -37,6 +38,7 @@ async def post(
     return centro_treinamento_out
 
 
+# GET ALL
 @router.get(
     "/",
     summary="Consultar todas os Centros de Treinamento",
@@ -50,15 +52,17 @@ async def query(db_session: DatabaseDependency) -> list[CentroTreinamentoOut]:
     return centrotreinamento
 
 
+# GET by ID
 @router.get(
     "/{id}",
     summary="Consultar um Centro de Treinamento pelo Id",
     status_code=status.HTTP_200_OK,
     response_model=CentroTreinamentoOut,
 )
-async def get_id(
-    id: UUID4, db_session: DatabaseDependency
-) -> list[CentroTreinamentoOut]:
+async def get(
+    id: UUID4,
+    db_session: DatabaseDependency,
+) -> CentroTreinamentoOut:
     centrotreinamento: CentroTreinamentoOut = (
         (await db_session.execute(select(CentroTreinamentoModel).filter_by(id=id)))
         .scalars()

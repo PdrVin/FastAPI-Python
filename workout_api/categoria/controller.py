@@ -11,6 +11,7 @@ from sqlalchemy.future import select
 router = APIRouter()
 
 
+# POST
 @router.post(
     "/",
     summary="Criar Nova Categoria",
@@ -18,9 +19,9 @@ router = APIRouter()
     response_model=CategoriaOut,
 )
 async def post(
-    db_session: DatabaseDependency, categoria_in: CategoriaIn = Body(...)
+    db_session: DatabaseDependency,
+    categoria_in: CategoriaIn = Body(...),
 ) -> CategoriaOut:
-
     categoria_out = CategoriaOut(id=uuid4(), **categoria_in.model_dump())
     categoria_model = CategoriaModel(**categoria_out.model_dump())
 
@@ -30,6 +31,7 @@ async def post(
     return categoria_out
 
 
+# GET ALL
 @router.get(
     "/",
     summary="Consultar todas as Categorias",
@@ -40,16 +42,18 @@ async def query(db_session: DatabaseDependency) -> list[CategoriaOut]:
     categorias: list[CategoriaOut] = (
         (await db_session.execute(select(CategoriaModel))).scalars().all()
     )
+
     return categorias
 
 
+# GET by ID
 @router.get(
     "/{id}",
     summary="Consultar uma Categoria pelo Id",
     status_code=status.HTTP_200_OK,
     response_model=CategoriaOut,
 )
-async def get_id(id: UUID4, db_session: DatabaseDependency) -> CategoriaOut:
+async def get(id: UUID4, db_session: DatabaseDependency) -> CategoriaOut:
     categoria: CategoriaOut = (
         (await db_session.execute(select(CategoriaModel).filter_by(id=id)))
         .scalars()
