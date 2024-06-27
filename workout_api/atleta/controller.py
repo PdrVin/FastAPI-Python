@@ -64,7 +64,7 @@ async def post(
     # Campos Gerais - Atleta
     try:
         atleta_out = AtletaOut(
-            id=uuid4(), created_at=datetime.now(timezone.utc), **atleta_in.model_dump()
+            id=uuid4(), created_at=datetime.utcnow(), **atleta_in.model_dump()
         )
         atleta_model = AtletaModel(
             **atleta_out.model_dump(exclude={"categoria", "centro_treinamento"})
