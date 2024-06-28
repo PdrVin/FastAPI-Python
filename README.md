@@ -37,11 +37,15 @@ A API permite o cadastro, atualização, remoção e consulta dessas entidades, 
    ```
    alembic revision --autogenerate -m init_db
    ```
-4. Executar o Servidor Local da API pelo Uvicorn
+4. Executar a Migração do Alembic
+   ```
+   alembic upgrade head
+   ```
+5. Executar o Servidor Local da API pelo Uvicorn
    ```
    uvicorn workout_api.main:app --reload
    ```
-5. Conferir os EndPoints do API Docs
+6. Conferir os EndPoints do API Docs
    -> [http://127.0.0.1:8000/docs]
 
 
