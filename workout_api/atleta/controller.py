@@ -1,4 +1,5 @@
-from fastapi import APIRouter, Body, HTTPException, status
+from typing import List, Optional
+from fastapi import APIRouter, Body, HTTPException, Query, status
 from datetime import datetime, timezone
 from uuid import uuid4
 from pydantic import UUID4
@@ -25,6 +26,20 @@ async def post(
     db_session: DatabaseDependency,
     atleta_in: AtletaIn = Body(...),
 ):
+    # Verificar Campo CPF
+    data_cpf = atleta_in.cpf
+    cpf = (
+        (await db_session.execute(select(AtletaModel).filter_by(cpf=data_cpf)))
+        .scalars()
+        .first()
+    )
+
+    if cpf:
+        raise HTTPException(
+            status_code=status.HTTP_303_SEE_OTHER,
+            detail=f"Já existe alguém cadastrado com o CPF: {data_cpf}",
+        )
+
     # Campo Categoria
     categoria_nome = atleta_in.categoria.nome
     categoria = (
@@ -91,7 +106,11 @@ async def post(
     status_code=status.HTTP_200_OK,
     response_model=list[AtletaOut],
 )
-async def query(db_session: DatabaseDependency) -> list[AtletaOut]:
+async def get(
+    db_session: DatabaseDependency,
+    nome: Optional[str] = Query(None),
+    cpf: Optional[str] = Query(None),
+) -> list[AtletaOut]:
     atletas: list[AtletaOut] = (
         (await db_session.execute(select(AtletaModel))).scalars().all()
     )
@@ -106,7 +125,12 @@ async def query(db_session: DatabaseDependency) -> list[AtletaOut]:
     status_code=status.HTTP_200_OK,
     response_model=AtletaOut,
 )
-async def get(id: UUID4, db_session: DatabaseDependency) -> AtletaOut:
+async def get_id(
+    id: UUID4,
+    db_session: DatabaseDependency,
+    nome: Optional[str] = Query(None),
+    cpf: Optional[str] = Query(None),
+) -> AtletaOut:
     atleta: AtletaOut = (
         (await db_session.execute(select(AtletaModel).filter_by(id=id)))
         .scalars()
@@ -133,6 +157,8 @@ async def patch(
     id: UUID4,
     db_session: DatabaseDependency,
     atleta_up: AtletaUpdate = Body(...),
+    nome: Optional[str] = Query(None),
+    cpf: Optional[str] = Query(None),
 ) -> AtletaOut:
     atleta: AtletaOut = (
         (await db_session.execute(select(AtletaModel).filter_by(id=id)))
@@ -162,7 +188,12 @@ async def patch(
     summary="Deletar um Atleta pelo Id",
     status_code=status.HTTP_204_NO_CONTENT,
 )
-async def delete(id: UUID4, db_session: DatabaseDependency) -> None:
+async def delete(
+    id: UUID4,
+    db_session: DatabaseDependency,
+    nome: Optional[str] = Query(None),
+    cpf: Optional[str] = Query(None),
+) -> None:
     atleta: AtletaOut = (
         (await db_session.execute(select(AtletaModel).filter_by(id=id)))
         .scalars()
@@ -177,3 +208,8 @@ async def delete(id: UUID4, db_session: DatabaseDependency) -> None:
 
     await db_session.delete(atleta)
     await db_session.commit()
+
+    raise HTTPException(
+        status_code=status.HTTP_204_NO_CONTENT,
+        detail=f"Atleta com id ({id}) excluído com sucesso.",
+    )
