@@ -58,3 +58,18 @@ class AtletaUpdate(BaseSchema):
         Optional[int],
         Field(None, description="Idade do Atleta", example=25),
     ]
+
+
+class AtletaResponse(BaseSchema):
+    nome: Annotated[
+        str,
+        Field(None, description="Nome do Atleta"),
+    ]
+    categoria: Annotated[
+        CategoriaIn,
+        Field(None, description="Categoria do Atleta"),
+    ]
+    centro_treinamento: Annotated[
+        CentroTreinamentoAtleta,
+        Field(None, description="Centro de Treinamento do Atleta"),
+    ]

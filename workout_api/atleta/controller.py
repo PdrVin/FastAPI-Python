@@ -7,7 +7,12 @@ from sqlalchemy.future import select
 
 from workout_api.base.dependencies import DatabaseDependency
 from workout_api.atleta.models import AtletaModel
-from workout_api.atleta.schemas import AtletaIn, AtletaOut, AtletaUpdate
+from workout_api.atleta.schemas import (
+    AtletaIn,
+    AtletaOut,
+    AtletaUpdate,
+    AtletaResponse,
+)
 
 from workout_api.categoria.models import CategoriaModel
 from workout_api.centro_treinamento.models import CentroTreinamentoModel
@@ -104,18 +109,25 @@ async def post(
     "/",
     summary="Consultar todos os Atletas",
     status_code=status.HTTP_200_OK,
-    response_model=list[AtletaOut],
+    response_model=list[AtletaResponse],
 )
 async def get(
     db_session: DatabaseDependency,
     nome: Optional[str] = Query(None),
     cpf: Optional[str] = Query(None),
-) -> list[AtletaOut]:
+) -> list[AtletaResponse]:
     atletas: list[AtletaOut] = (
         (await db_session.execute(select(AtletaModel))).scalars().all()
     )
 
-    return [AtletaOut.model_validate(atleta) for atleta in atletas]
+    return [
+        AtletaResponse(
+            nome=atleta.nome,
+            categoria=CategoriaModel(nome=atleta.categoria.nome),
+            centro_treinamento=CentroTreinamentoModel(nome=atleta.centro_treinamento.nome)
+        )
+        for atleta in atletas
+    ]
 
 
 # GET BY ID
