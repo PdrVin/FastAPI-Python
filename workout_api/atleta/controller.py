@@ -1,9 +1,10 @@
-from typing import List, Optional
+from typing import Optional
 from fastapi import APIRouter, Body, HTTPException, Query, status
-from datetime import datetime, timezone
+from datetime import datetime
 from uuid import uuid4
 from pydantic import UUID4
 from sqlalchemy.future import select
+from sqlalchemy.exc import IntegrityError
 
 from workout_api.base.dependencies import DatabaseDependency
 from workout_api.atleta.models import AtletaModel
@@ -31,20 +32,6 @@ async def post(
     db_session: DatabaseDependency,
     atleta_in: AtletaIn = Body(...),
 ):
-    # Verificar Campo CPF
-    data_cpf = atleta_in.cpf
-    cpf = (
-        (await db_session.execute(select(AtletaModel).filter_by(cpf=data_cpf)))
-        .scalars()
-        .first()
-    )
-
-    if cpf:
-        raise HTTPException(
-            status_code=status.HTTP_303_SEE_OTHER,
-            detail=f"Já existe alguém cadastrado com o CPF: {data_cpf}",
-        )
-
     # Campo Categoria
     categoria_nome = atleta_in.categoria.nome
     categoria = (
@@ -95,6 +82,11 @@ async def post(
 
         db_session.add(atleta_model)
         await db_session.commit()
+    except IntegrityError:
+        raise HTTPException(
+            status_code=status.HTTP_303_SEE_OTHER,
+            detail=f"Já existe um atleta cadastrado com o cpf: {atleta_in.cpf}",
+        )
     except Exception as err:
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -124,7 +116,9 @@ async def get(
         AtletaResponse(
             nome=atleta.nome,
             categoria=CategoriaModel(nome=atleta.categoria.nome),
-            centro_treinamento=CentroTreinamentoModel(nome=atleta.centro_treinamento.nome)
+            centro_treinamento=CentroTreinamentoModel(
+                nome=atleta.centro_treinamento.nome
+            ),
         )
         for atleta in atletas
     ]
