@@ -5,6 +5,7 @@ from uuid import uuid4
 from pydantic import UUID4
 from sqlalchemy.future import select
 from sqlalchemy.exc import IntegrityError
+from fastapi_pagination import LimitOffsetPage, paginate, add_pagination
 
 from workout_api.base.dependencies import DatabaseDependency
 from workout_api.atleta.models import AtletaModel
@@ -101,27 +102,26 @@ async def post(
     "/",
     summary="Consultar todos os Atletas",
     status_code=status.HTTP_200_OK,
-    response_model=list[AtletaResponse],
+    response_model=LimitOffsetPage[AtletaResponse],
 )
 async def get(
     db_session: DatabaseDependency,
-    nome: Optional[str] = Query(None),
-    cpf: Optional[str] = Query(None),
-) -> list[AtletaResponse]:
-    atletas: list[AtletaOut] = (
-        (await db_session.execute(select(AtletaModel))).scalars().all()
-    )
+    limit: int = Query(10, ge=1, le=100),
+    offset: int = Query(0, ge=0),
+) -> LimitOffsetPage[AtletaResponse]:
+    atletas_query = await db_session.execute(select(AtletaModel).offset(offset).limit(limit))
+    atletas: list[AtletaOut] = atletas_query.scalars().all()
 
-    return [
+    atletas_response = [
         AtletaResponse(
             nome=atleta.nome,
             categoria=CategoriaModel(nome=atleta.categoria.nome),
-            centro_treinamento=CentroTreinamentoModel(
-                nome=atleta.centro_treinamento.nome
-            ),
+            centro_treinamento=CentroTreinamentoModel(nome=atleta.centro_treinamento.nome)
         )
         for atleta in atletas
     ]
+
+    return paginate(atletas_response)
 
 
 # GET BY ID
@@ -219,3 +219,5 @@ async def delete(
         status_code=status.HTTP_204_NO_CONTENT,
         detail=f"Atleta com id ({id}) excluído com sucesso.",
     )
+
+add_pagination(router)
